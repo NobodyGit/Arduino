@@ -1,3 +1,7 @@
+//实验组件：16x2 I2C LCD显示模块一个
+
+//正常输出：串口监视器9600波特率输出扫描结果，检测到I2C在xx(eg.0x27)位置
+
 #include <Wire.h>
 #include <i2cdetect.h>
 
