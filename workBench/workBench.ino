@@ -1,43 +1,38 @@
-int red_light_pin= 17;
-int green_light_pin = 25;
-int blue_light_pin = 26;
-void setup() {
-  //setup channel 0 with frequency 312500 Hz
-  sigmaDeltaSetup(0, 312500);
-  //attach pin 18 to channel 0
-  sigmaDeltaAttachPin(red_light_pin,0);
-  
-  //setup channel 1 with frequency 312500 Hz
-  sigmaDeltaSetup(1, 312500);
-  //attach pin 18 to channel 1
-  sigmaDeltaAttachPin(green_light_pin,1);
-  
-  //setup channel 2 with frequency 312500 Hz
-  sigmaDeltaSetup(2, 312500);
-  //attach pin 18 to channel 2
-  sigmaDeltaAttachPin(blue_light_pin,2);
+#define BLYNK_PRINT Serial
+
+int pin = 21;
+
+#include <WiFi.h>
+#include <WiFiClient.h>
+#include <BlynkSimpleEsp32.h>
+
+char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd";
+
+char ssid[] = "Student";
+char pass[] = "xmustudent";
+
+void setup(){
+  pinMode(pin, OUTPUT);
+  pinMode(pin, HIGH);
+  Serial.begin(115200);
+
+  delay(10);
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, pass);
+  int wifi_ctr = 0;
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("WiFi connected");
+
+  Blynk.begin("hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd", ssid, pass);
 }
-void loop() {
-  RGB_color(255, 0, 0); // Red
-  delay(1000);
-  RGB_color(0, 255, 0); // Green
-  delay(1000);
-  RGB_color(0, 0, 255); // Blue
-  delay(1000);
-  RGB_color(255, 255, 125); // Raspberry
-  delay(1000);
-  RGB_color(0, 255, 255); // Cyan
-  delay(1000);
-  RGB_color(255, 0, 255); // Magenta
-  delay(1000);
-  RGB_color(255, 255, 0); // Yellow
-  delay(1000);
-  RGB_color(255, 255, 255); // White
-  delay(1000);
+
+void loop(){
+  Blynk.run();
 }
-void RGB_color(int red_light_value, int green_light_value, int blue_light_value)
- {
-  sigmaDeltaWrite(red_light_pin, red_light_value);
-  sigmaDeltaWrite(green_light_pin, green_light_value);
-  sigmaDeltaWrite(blue_light_pin, blue_light_value);
-}
+ 
