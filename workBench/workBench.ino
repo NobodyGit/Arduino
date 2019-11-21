@@ -1,38 +1,15 @@
-#define BLYNK_PRINT Serial
-
-int pin = 21;
-
-#include <WiFi.h>
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
-
-char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd";
-
-char ssid[] = "Student";
-char pass[] = "xmustudent";
-
-void setup(){
-  pinMode(pin, OUTPUT);
-  pinMode(pin, HIGH);
-  Serial.begin(115200);
-
-  delay(10);
-  Serial.print("Connecting to ");
-  Serial.println(ssid);
-
-  WiFi.begin(ssid, pass);
-  int wifi_ctr = 0;
-  while(WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-
-  Serial.println("WiFi connected");
-
-  Blynk.begin("hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd", ssid, pass);
-}
-
-void loop(){
-  Blynk.run();
+int pinRelay = 16; //管脚D3连接到继电器模块的信号脚
+ 
+void setup() {
+  pinMode(pinRelay, OUTPUT); //设置pinRelay脚为输出状态
 }
  
+void loop() { 
+  pinMode(pinRelay, OUTPUT); //设置pinRelay脚为输出状态
+//   digitalWrite(pinRelay, HIGH);//输出HIGH电平,继电器模块闭合
+   delay(3000); //等待5000毫秒
+
+ pinMode(pinRelay, INPUT); //设置pinRelay脚为输出状态
+//   digitalWrite(pinRelay, LOW);//输出LOW电平,继电器模块断开
+   delay(3000); //等待8000毫秒
+}
