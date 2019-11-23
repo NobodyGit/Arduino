@@ -1,20 +1,13 @@
-/*
- Mega analogWrite() test
+//实验组件：伺服电机一个
 
- This sketch fades LEDs up and down one at a time on digital pins 2 through 13.
- This sketch was written for the Arduino Mega, and will not work on previous boards.
+//组件描述(Servo Motor)：
+//红线接VCC(mid)，咖啡色（黑色）接GND，橙色（黄或白）接信号
 
- The circuit:
- * LEDs attached from pins 2 through 13 to ground.
+//接线要求：（按需求设置）
+//橙线接IO16
 
- created 8 Feb 2009
- by Tom Igoe
+//正常输出：伺服电机间歇转动
 
- This example code is in the public domain.
-
- */
-// These constants won't change.  They're used to give names
-// to the pins used:
 const int thisPin = 16;
 #include <ESP32Servo.h>
 Servo myservo;

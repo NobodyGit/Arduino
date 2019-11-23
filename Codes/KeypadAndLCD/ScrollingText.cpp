@@ -1,3 +1,13 @@
+//实验组件：16x2 I2C LCD显示模块一个
+
+//组件描述（16x2 I2C LCD显示模块）：
+//4个接口，按模块接口编号默认接线
+
+//接线要求：
+//I2C LCD显示模块按编号默认接线
+
+//正常输出：第一行为静态文本"Static message"，第二行为滚动文本"This is a scrolling message with more than 16 characters"
+
 #include <LiquidCrystal_I2C.h>
 
 // set the LCD number of columns and rows
@@ -15,7 +25,7 @@ String messageToScroll = "This is a scrolling message with more than 16 characte
 // The function acepts the following arguments:
 // row: row number where the text will be displayed
 // message: message to scroll
-// delayTime: delay between each character shifting
+// delayTime: delay between each character shifting（调节滚动速度）
 // lcdColumns: number of columns of your LCD
 void scrollText(int row, String message, int delayTime, int lcdColumns) {
   for (int i=0; i < lcdColumns; i++) {

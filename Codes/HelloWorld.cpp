@@ -1,3 +1,7 @@
+//实验组件：R32开发板一个
+
+//正常输出：串口监视器115200波特率每隔小段时间输出"Hello, WeMos! HaHa"
+
 void setup() {
  Serial.begin(112500);
  pinMode(2, OUTPUT);
