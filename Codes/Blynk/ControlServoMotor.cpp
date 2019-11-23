@@ -1,20 +1,6 @@
 #define BLYNK_PRINT Serial
 
 #include <WiFi.h>
-//实验组件：Blynk Slider，伺服电机一个
-
-//组件描述(Servo Motor)：
-//红线接VCC(mid)，咖啡色（黑色）接GND，橙色（黄或白）接信号
-//注意：接错可能导致组件烧毁！
-//组件描述（Blynk Slider）：
-//Blynk app虚拟组件
-//Slider PIN设置为V1，Mode设置为Switch，其余默认
-
-//接线要求：（按需求设置）
-//橙线接IO16
-
-//正常输出：伺服电机来回转动
-
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
 

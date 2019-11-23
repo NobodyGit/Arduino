@@ -8,12 +8,12 @@
 //注意：接错可能导致组件烧毁！
 //组件描述（Blynk Slider）：
 //Blynk app虚拟组件
-//Slider PIN设置为V1，Mode设置为Switch，其余默认
+//Slider PIN设置为V1，最大值设为180，其余默认
 
 //接线要求：（按需求设置）
 //橙线接IO16
 
-//正常输出：伺服电机来回转动
+//正常输出：伺服电机根据Slider回传值转动，串口监视器115200波特率输出Slider回传值
 
 #include <WiFiClient.h>
 #include <BlynkSimpleEsp32.h>
