@@ -1,69 +1,51 @@
-#define BLYNK_PRINT Serial
+#include "DHT.h"
+#include <LiquidCrystal_I2C.h>
 
-#include <WiFi.h>
-//实验组件：Blynk Slider，伺服电机一个
+int lcdColumns = 16;
+int lcdRows = 2;
 
-//组件描述(Servo Motor)：
-//红线接VCC(mid)，咖啡色（黑色）接GND，橙色（黄或白）接信号
-//注意：接错可能导致组件烧毁！
-//组件描述（Blynk Slider）：
-//Blynk app虚拟组件
-//Slider PIN设置为V1，Mode设置为Switch，其余默认
+#define DHTPIN 2
+#define DHTTYPE DHT11
 
-//接线要求：（按需求设置）
-//橙线接IO16
+DHT dht(DHTPIN, DHTTYPE);
+LiquidCrystal_I2C lcd(0x27, lcdColumns, lcdRows);  
 
-//正常输出：伺服电机来回转动
-
-#include <WiFiClient.h>
-#include <BlynkSimpleEsp32.h>
-
-const int thisPin = 16;
-#include <ESP32Servo.h>
-Servo myservo;
-
-char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd";
-//Blynk 项目token
-
-char ssid[] = "MYHL";
-char pass[] = "123456789";
-//WiFi信息：
-//ssid为WiFi名，pass为密码
-
-BLYNK_WRITE(V1)
-{
-	int pinValue = param.asInt(); // assigning incoming value from pin V1 to a variable
-	// You can also use:
-	// String i = param.asStr();
-	// double d = param.asDouble();
-	Serial.print("V1 Slider value is: ");
-	Serial.println(pinValue);
-	myservo.write(pinValue);
+void scrollText(int row, String message, int delayTime, int lcdColumns) {
+  for (int i=0; i < lcdColumns; i++) {
+    message = " " + message;  
+  } 
+  message = message + " "; 
+  for (int pos = 0; pos < message.length(); pos++) {
+    lcd.setCursor(0, row);
+    lcd.print(message.substring(pos, pos + lcdColumns));
+    delay(delayTime);
+  }
 }
 
-void setup()
-{
-	Serial.begin(115200);
-	myservo.attach(thisPin);
-
-	delay(10);
-	Serial.print("Connecting to ");
-	Serial.println(ssid);
-
-	WiFi.begin(ssid, pass);
-	int wifi_ctr = 0;
-	while (WiFi.status() != WL_CONNECTED)
-	{
-		delay(500);
-		Serial.print(".");
-	}
-
-	Serial.println("WiFi connected");
-
-	Blynk.begin(auth, ssid, pass);
+void setup() {
+  dht.begin();
+  lcd.init();                 
+  lcd.backlight();
 }
 
-void loop()
-{
-	Blynk.run();
+void loop() {
+  delay(2000);
+
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
+  float f = dht.readTemperature(true);
+
+  if (isnan(h) || isnan(t) || isnan(f)) {
+    lcd.println(F("Failed to read from DHT sensor!"));
+    return;
+  }
+
+  lcd.setCursor(0, 0);
+  lcd.print("Humidity: ");
+  lcd.print(h);
+  lcd.print("%");
+  lcd.setCursor(0, 1);
+  char temp[30];
+  sprintf(temp, "Temperature: %f°C %f°F", t, f);
+  scrollText(1,temp,500,lcdColumns);
 }
