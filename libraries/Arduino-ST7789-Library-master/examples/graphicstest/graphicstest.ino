@@ -1,83 +1,101 @@
-#include <Adafruit_GFX.h>   // Core graphics library by Adafruit
-#include <Arduino_ST7789.h> // Library for ST7789 (with or without CS pin)
+/***************************************************
+  This is a library for the ST7789 IPS SPI display.
+
+  Originally written by Limor Fried/Ladyada for 
+  Adafruit Industries.
+
+  Modified by Ananev Ilia
+ ****************************************************/
+
+#include <Adafruit_GFX.h>    // Core graphics library by Adafruit
+#include <Arduino_ST7789.h> // Hardware-specific library for ST7789 (with or without CS pin)
 #include <SPI.h>
 
-#define TFT_DC    12     // Data/Command
-#define TFT_RST   13     // ST7789 Reset
-#define TFT_MOSI  5    // SPI data pin
-#define TFT_SCLK  23    // SPI sclk pin
+#define TFT_DC    8
+#define TFT_RST   9 
+#define TFT_CS    10 // only for displays with CS pin
+#define TFT_MOSI  11   // for hardware SPI data pin (all of available pins)
+#define TFT_SCLK  13   // for hardware SPI sclk pin (all of available pins)
 
-// For Hardware SPI
-// Using hardware SPI pins (11, 13 on UNO; 51, 52 on MEGA; ICSP-4, ICSP-3 on DUE and etc)
+//You can use different type of hardware initialization
+//using hardware SPI (11, 13 on UNO; 51, 52 on MEGA; ICSP-4, ICSP-3 on DUE and etc)
 //Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST); //for display without CS pin
+//Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST, TFT_CS); //for display with CS pin
+//or you can use software SPI on all available pins (slow)
+//Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK); //for display without CS pin
+//Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_CS); //for display with CS pin
+Arduino_ST7789 tft = Arduino_ST7789(-1, TFT_RST, TFT_MOSI, TFT_SCLK, TFT_CS); //for display with CS pin and DC via 9bit SPI
 
-// Using software SPI on any available pins.  Define above if changes are needed (slower)
-Arduino_ST7789 tft = Arduino_ST7789(TFT_DC, TFT_RST, TFT_MOSI, TFT_SCLK); //for display without CS pin
 
 float p = 3.1415926;
-//===============================================================================
-//  Initialization
-//===============================================================================
-void setup() {
 
-  tft.init(240, 240);   // initialize ST7789 chip at 240x240 pixels
+void setup(void) {
+  Serial.begin(9600);
+  Serial.print("Hello! ST7789 TFT Test");
 
-  // Paint red/green/blue rectangles
-  tft.fillRect(0, 0 , 240, 80, RED);
-  tft.fillRect(0, 80 , 240, 160, GREEN);
-  tft.fillRect(0, 160 , 240, 240, BLUE);
-  delay (1000);
+  tft.init(240, 240);   // initialize a ST7789 chip, 240x240 pixels
 
-   // large block of text
+  Serial.println("Initialized");
+
+  uint16_t time = millis();
+  tft.fillScreen(BLACK);
+  time = millis() - time;
+
+  Serial.println(time, DEC);
+  delay(500);
+
+  // large block of text
   tft.fillScreen(BLACK);
   testdrawtext("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur adipiscing ante sed nibh tincidunt feugiat. Maecenas enim massa, fringilla sed malesuada et, malesuada sit amet turpis. Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a tortor imperdiet posuere. ", WHITE);
   delay(1000);
 
+  // tft print function
+  tftPrintTest();
+  delay(4000);
+
   // a single pixel
   tft.drawPixel(tft.width()/2, tft.height()/2, GREEN);
-  delay(1000);
+  delay(500);
 
   // line draw test
   testlines(YELLOW);
-  delay(1000);
+  delay(500);
 
   // optimized lines
   testfastlines(RED, BLUE);
-  delay(1000);
+  delay(500);
 
   testdrawrects(GREEN);
-  delay(1000);
+  delay(500);
 
   testfillrects(YELLOW, MAGENTA);
-  delay(1000);
+  delay(500);
 
   tft.fillScreen(BLACK);
   testfillcircles(10, BLUE);
   testdrawcircles(10, WHITE);
-  delay(1000);
+  delay(500);
 
   testroundrects();
-  delay(1000);
+  delay(500);
 
   testtriangles();
-  delay(1000);
+  delay(500);
 
   mediabuttons();
+  delay(500);
+
+  Serial.println("done");
   delay(1000);
 }
-//===============================================================================
-//  Main
-//===============================================================================
+
 void loop() {
- 
   tft.invertDisplay(true);
   delay(500);
   tft.invertDisplay(false);
   delay(500);
 }
-//===============================================================================
-//  Subroutines
-//===============================================================================
+
 void testlines(uint16_t color) {
   tft.fillScreen(BLACK);
   for (int16_t x=0; x < tft.width(); x+=6) {
@@ -85,6 +103,30 @@ void testlines(uint16_t color) {
   }
   for (int16_t y=0; y < tft.height(); y+=6) {
     tft.drawLine(0, 0, tft.width()-1, y, color);
+  }
+
+  tft.fillScreen(BLACK);
+  for (int16_t x=0; x < tft.width(); x+=6) {
+    tft.drawLine(tft.width()-1, 0, x, tft.height()-1, color);
+  }
+  for (int16_t y=0; y < tft.height(); y+=6) {
+    tft.drawLine(tft.width()-1, 0, 0, y, color);
+  }
+
+  tft.fillScreen(BLACK);
+  for (int16_t x=0; x < tft.width(); x+=6) {
+    tft.drawLine(0, tft.height()-1, x, 0, color);
+  }
+  for (int16_t y=0; y < tft.height(); y+=6) {
+    tft.drawLine(0, tft.height()-1, tft.width()-1, y, color);
+  }
+
+  tft.fillScreen(BLACK);
+  for (int16_t x=0; x < tft.width(); x+=6) {
+    tft.drawLine(tft.width()-1, tft.height()-1, x, 0, color);
+  }
+  for (int16_t y=0; y < tft.height(); y+=6) {
+    tft.drawLine(tft.width()-1, tft.height()-1, 0, y, color);
   }
 }
 
@@ -173,6 +215,45 @@ void testroundrects() {
     }
     color+=100;
   }
+}
+
+void tftPrintTest() {
+  tft.setTextWrap(false);
+  tft.fillScreen(BLACK);
+  tft.setCursor(0, 30);
+  tft.setTextColor(RED);
+  tft.setTextSize(1);
+  tft.println("Hello World!");
+  tft.setTextColor(YELLOW);
+  tft.setTextSize(2);
+  tft.println("Hello World!");
+  tft.setTextColor(GREEN);
+  tft.setTextSize(3);
+  tft.println("Hello World!");
+  tft.setTextColor(BLUE);
+  tft.setTextSize(4);
+  tft.print(1234.567);
+  delay(1500);
+  tft.setCursor(0, 0);
+  tft.fillScreen(BLACK);
+  tft.setTextColor(WHITE);
+  tft.setTextSize(0);
+  tft.println("Hello World!");
+  tft.setTextSize(1);
+  tft.setTextColor(GREEN);
+  tft.print(p, 6);
+  tft.println(" Want pi?");
+  tft.println(" ");
+  tft.print(8675309, HEX); // print 8,675,309 out in HEX!
+  tft.println(" Print HEX!");
+  tft.println(" ");
+  tft.setTextColor(WHITE);
+  tft.println("Sketch has been");
+  tft.println("running for: ");
+  tft.setTextColor(MAGENTA);
+  tft.print(millis() / 1000);
+  tft.setTextColor(WHITE);
+  tft.print(" seconds.");
 }
 
 void mediabuttons() {
