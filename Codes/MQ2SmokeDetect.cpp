@@ -1,3 +1,11 @@
+//实验组件：MQ2 烟雾传感器一个
+
+//组件描述（MQ2 烟雾传感器）：
+//AO接口为Analog out，对应Analog pin，DO接口为Digital out，对应Digital pin
+
+//接线要求：（按需求设置）
+//烟雾传感器VCC接5v，GND接GND，AO接analog pin 2，DO可选择
+
 #define MQ2pin (2)
 
 float sensorValue;  //variable to store sensor value
