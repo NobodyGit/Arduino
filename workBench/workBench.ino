@@ -27,13 +27,13 @@ const int light_sensor_pin = 14;
 #define DHTTYPE DHT22 //DHT type
 DHT dht(DHTPIN, DHTTYPE); // DHT init
 
-//sensors detection standard
-int smoke_standard = 300;
-
 //actuators' pins
 const int relay1_pin = 16; //relay1 pin, control ...
 const int led1_pin = 18; //led1 pin, actuator of light sensor
 const int buzzer1_pin = 27; //buzzer1 pin, actuator of smoke sensor
+
+//sensors alarm standard
+int smoke_standard = 300;
 
 //sensors' values
 int light_sensor_value, fire_sensor_value, smoke_sensor_value;
@@ -177,6 +177,14 @@ void Task_LCD( void *pvParameters ){
       lcd.setCursor(0, 1);
       lcd.print(text);
       vTaskDelay( 3000 / portTICK_PERIOD_MS );
+      for(int pos=0; pos<text.length(); pos++){
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print("DHT sensor:");
+        lcd.setCursor(0, 1);
+        lcd.print(text.substring(pos));
+        vTaskDelay( 200 / portTICK_PERIOD_MS );
+      }
     }
 
     if (isnan(temp)){
@@ -219,7 +227,7 @@ void Task_LCD( void *pvParameters ){
 
 void Task_Buzzer1( void *pvParameters ){
   while(1){
-    if(smoke_sensor_value>300){
+    if(smoke_sensor_value>smoke_standard){
       unsigned char i,j;
 
       for(i=0;i<80;i++)//输出一个频率的s声音
