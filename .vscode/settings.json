@@ -2,6 +2,9 @@
     "C_Cpp.intelliSenseEngine": "Tag Parser",
     "files.associations": {
         "random": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "xlocale": "cpp",
+        "xstring": "cpp",
+        "string_view": "cpp"
     }
 }
