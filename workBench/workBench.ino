@@ -18,19 +18,20 @@ String appendSpace ( String text );
 //blynk and wifi related variables
 #define BLYNK_PRINT Serial
 char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd"; //blynk project token
-char ssid[] = "diya-laptop"; //wifi id
-char pass[] = "a1MckxYh"; //wifi password
+char ssid[] = "zsl"; //wifi id
+char pass[] = "987654321"; //wifi password
 
 //sensors' pins
 #define MQ2PIN 39  //smoke sensor pin
-#define LSNPIN 14 //light sensor pin
-#define FSNPIN 12 //fire sensor pin
+#define MSNPIN 34 //moisture sensor pin
+#define LSNPIN 36 //light sensor pin
+#define FSNPIN 4 //fire sensor pin
 #define DHTPIN 13  //DHT sensor pin
 
 //actuators' pins
-const int relay_pin1 = 27; //relay1 pin, control water pump
-const int relay_pin2 = 16; //relay2 pin, control fan
-const int buzzer1_pin = 17; //buzzer1 pin, actuator of smoke sensor
+const int relay_pin1 = 12; //relay1 pin, control water pump
+const int relay_pin2 = 14; //relay2 pin, control fan
+const int buzzer1_pin = 27; //buzzer1 pin, actuator of smoke sensor
 const int led1_pin = 18; //led1 pin, actuator of light sensor
 
 //Init DHT sensor
@@ -43,7 +44,7 @@ int smoke_alarm_level = 1500;
 float fan_switch_temp = 26;
 
 //sensors' values
-int light_sensor_value = 0, fire_sensor_value = 0;
+int light_sensor_value = 0, fire_sensor_value = 0, mositure_sensor_value = 0;
 float smoke_sensor_value = 0;
 float humi = 0, temp = 0, fah_temp = 0, heatind = 0, fah_heatind = 0; //dht values: humidity, temperature, temperature based on Fahrenheit, heat index, heat index based on Fahrenheit
 
@@ -84,10 +85,11 @@ BLYNK_WRITE(V4){
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   //input pins
   pinMode(MQ2PIN, INPUT);
+  pinMode(MSNPIN, INPUT);
   pinMode(LSNPIN, INPUT);
   pinMode(FSNPIN, INPUT);
 
@@ -145,6 +147,7 @@ void Task_Read (void *pvParameters ){
   while(1){
     //read from normal sensors
     smoke_sensor_value = analogRead(MQ2PIN);
+    mositure_sensor_value = analogRead(MSNPIN);
     light_sensor_value = analogRead(LSNPIN);
     fire_sensor_value = analogRead(FSNPIN);
 
@@ -163,12 +166,14 @@ void Task_Serial( void *pvParameters ){
   while(1){
     Serial.println("-------------------------------------------------------------------------");
 
-    Serial.print("Light sensor value: ");
+    Serial.print("Smoke sensor value: ");
+    Serial.print(smoke_sensor_value);
+    Serial.print(";  Mositure sensor value: ");
+    Serial.print(mositure_sensor_value);
+    Serial.print(";  Light sensor value: ");
     Serial.print(light_sensor_value);
     Serial.print(";  Fire sensor value: ");
-    Serial.print(fire_sensor_value);
-    Serial.print(";  Smoke sensor value: ");
-    Serial.println(smoke_sensor_value);
+    Serial.println(fire_sensor_value);
 
     if(smoke_sensor_value>smoke_alarm_level){
       Serial.println("Smoke concentration is in dangerous level now.");
@@ -206,6 +211,34 @@ void Task_LCD( void *pvParameters ){
   String text;
   char sensor_value[20];
   while(1){
+    if(smoke_sensor_value==0 || smoke_sensor_value==4095){
+      displayStaticText("Fail to read", "         smoke", 2000);
+    }
+    else{
+      while(smoke_sensor_value>smoke_alarm_level){
+        displayStaticText("Warnning!", "Fire detected!", sensors_detect_duration);
+      }
+      dtostrf(smoke_sensor_value, 2, 1, sensor_value);
+      text = "        " + String(sensor_value);
+      displayText("Current smoke:", text, 3000, 200);
+    }
+
+    if(light_sensor_value==0 || light_sensor_value==4095){
+      displayStaticText("Fail to read", "      mositure", 2000);
+    }
+    else{
+      text = "        " + String(mositure_sensor_value);
+      displayText("Soil mositure:", text, 3000, 200);
+    }
+
+    if(light_sensor_value==0 || light_sensor_value==4095){
+      displayStaticText("Fail to read", "         light", 2000);
+    }
+    else{
+      text = "        " + String(light_sensor_value);
+      displayText("Current light:", text, 3000, 200);
+    }
+
     if (isnan(humi)){
       displayStaticText("Fail to read", "      humidity", 2000);
     }
@@ -231,26 +264,6 @@ void Task_LCD( void *pvParameters ){
       dtostrf(fah_temp, 2, 1, sensor_value);
       text = "        " + String(sensor_value);
       displayText("Now Temp(\337F):", text, 3000, 200);
-    }
-
-    if(light_sensor_value==0 || light_sensor_value==4095){
-      displayStaticText("Fail to read", "         light", 2000);
-    }
-    else{
-      text = "        " + String(light_sensor_value);
-      displayText("Current light:", text, 3000, 200);
-    }
-
-    if(smoke_sensor_value==0 || smoke_sensor_value==4095){
-      displayStaticText("Fail to read", "         smoke", 2000);
-    }
-    else{
-      while(smoke_sensor_value>smoke_alarm_level){
-        displayStaticText("Warnning!", "Fire detected!", sensors_detect_duration);
-      }
-      dtostrf(smoke_sensor_value, 2, 1, sensor_value);
-      text = "        " + String(sensor_value);
-      displayText("Current smoke:", text, 3000, 200);
     }
   }
 }
@@ -342,8 +355,13 @@ void Task_Buzzer1( void *pvParameters ){
 
 void Task_Relay( void *pvParameters ){
   while(1){
-    if(temp>fan_switch_temp){
-      digitalWrite(relay_pin2, HIGH);
+    if(!isnan(temp)){
+      if(temp>fan_switch_temp){
+        digitalWrite(relay_pin2, HIGH);
+      }
+      else{
+        digitalWrite(relay_pin2, LOW);
+      }
     }
     else{
       digitalWrite(relay_pin2, LOW);
