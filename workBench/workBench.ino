@@ -41,6 +41,7 @@ DHT dht(DHTPIN, DHTTYPE); // DHT init
 //sensors standard
 int sensors_detect_duration = 500;
 int smoke_alarm_level = 1500;
+int pump_switch_level = 2500;
 float fan_switch_temp = 26;
 
 //sensors' values
@@ -355,6 +356,18 @@ void Task_Buzzer1( void *pvParameters ){
 
 void Task_Relay( void *pvParameters ){
   while(1){
+     if(mositure_sensor_value!=0&&mositure_sensor_value!=4095){
+      if(mositure_sensor_value<fan_switch_temp){
+        digitalWrite(relay_pin1, HIGH);
+      }
+      else{
+        digitalWrite(relay_pin1, LOW);
+      }
+    }
+    else{
+      digitalWrite(relay_pin1, LOW);
+    }
+    
     if(!isnan(temp)){
       if(temp>fan_switch_temp){
         digitalWrite(relay_pin2, HIGH);
