@@ -357,7 +357,7 @@ void Task_Buzzer1( void *pvParameters ){
 void Task_Relay( void *pvParameters ){
   while(1){
      if(mositure_sensor_value!=0&&mositure_sensor_value!=4095){
-      if(mositure_sensor_value<fan_switch_temp){
+      if(mositure_sensor_value<pump_switch_level){
         digitalWrite(relay_pin1, HIGH);
       }
       else{
