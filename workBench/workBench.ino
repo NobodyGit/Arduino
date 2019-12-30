@@ -18,7 +18,7 @@ String appendSpace ( String text );
 //blynk and wifi related variables
 #define BLYNK_PRINT Serial
 char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd"; //blynk project token
-char ssid[] = "zsl"; //wifi id
+char ssid[] = "cc"; //wifi id
 char pass[] = "987654321"; //wifi password
 
 //sensors' pins
