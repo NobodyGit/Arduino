@@ -18,8 +18,8 @@ String appendSpace ( String text );
 //blynk and wifi related variables
 #define BLYNK_PRINT Serial
 char auth[] = "hfJ0lheL1MRy3lcTOdKXW_cCAf0EmCQd"; //blynk project token
-char ssid[] = "zsl"; //wifi id
-char pass[] = "987654321"; //wifi password
+char ssid[] = "diya-laptop"; //wifi id
+char pass[] = "a1MckxYh"; //wifi password
 
 //sensors' pins
 #define MQ2PIN 39  //smoke sensor pin
@@ -40,7 +40,7 @@ DHT dht(DHTPIN, DHTTYPE); // DHT init
 
 //sensors standard
 int sensors_detect_duration = 500;
-int smoke_alarm_level = 1500;
+int smoke_alarm_level = 2400;
 int pump_switch_level = 2500;
 float fan_switch_temp = 26;
 
